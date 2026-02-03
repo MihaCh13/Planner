@@ -350,10 +350,41 @@
   justify-content: flex-start;
   border-radius: 0;
   box-shadow: none;
+  position: relative;
 }
 
 .event-block.diagonal::before {
   display: none;
+}
+
+/* Visible border for diagonal odd triangle (top-left) */
+.diagonal-odd .event-block.diagonal::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 141.42%;
+  height: 2px;
+  background: rgba(0, 0, 0, 0.15);
+  transform-origin: 0 0;
+  transform: rotate(45deg);
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* Visible border for diagonal even triangle (bottom-right) */
+.diagonal-even .event-block.diagonal::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 141.42%;
+  height: 2px;
+  background: rgba(0, 0, 0, 0.15);
+  transform-origin: 100% 100%;
+  transform: rotate(45deg);
+  pointer-events: none;
+  z-index: 20;
 }
 
 /* ODD diagonal - content top-left with padding to avoid badge */

@@ -34,12 +34,12 @@ export function Legend() {
         <div className="h-6 w-px bg-border" />
         
         <div className="flex items-center gap-2 text-foreground/80">
-          <div className="w-4 h-4 rounded bg-[var(--odd-split-bg)] border border-blue-200" />
+          <div className="w-5 h-5 rounded" style={{ backgroundColor: '#85daff' }} />
           <span className="text-sm font-medium">Нечетна седмица</span>
         </div>
         
         <div className="flex items-center gap-2 text-foreground/80">
-          <div className="w-4 h-4 rounded bg-[var(--even-split-bg)] border border-purple-200" />
+          <div className="w-5 h-5 rounded" style={{ backgroundColor: '#ff9ec6' }} />
           <span className="text-sm font-medium">Четна седмица</span>
         </div>
       </div>

@@ -58,9 +58,11 @@ export function EventBlock({
         {/* Subject Name - LARGE & BOLD (Top) */}
         <div className={cn(
           "font-bold text-slate-900 break-words tracking-tight hyphens-auto leading-tight",
-          isCompact || isDiagonal
-            ? "text-[10px] line-clamp-2" 
-            : "text-[16px] line-clamp-3"
+          isCompact 
+            ? "text-[10px] line-clamp-2"
+            : isDiagonal 
+              ? "text-[13px] line-clamp-2 font-extrabold"
+              : "text-[16px] line-clamp-3"
         )}
         style={{ wordBreak: 'break-word' }}
         >
@@ -69,19 +71,20 @@ export function EventBlock({
         
         {/* Room Number */}
         <div className={cn(
-          "font-normal text-slate-600",
-          isCompact || isDiagonal ? "text-[9px]" : "text-[13px]"
+          "font-medium text-slate-600",
+          isCompact ? "text-[9px]" : isDiagonal ? "text-[11px]" : "text-[13px]"
         )}>
           {event.room || '-'}
         </div>
         
-        {/* For makeup events: show session type */}
+        {/* For makeup events: show session type and group */}
         {isMakeup && (
           <div className={cn(
             "font-semibold text-slate-700",
-            isCompact || isDiagonal ? "text-[8px]" : "text-[11px]"
+            isCompact ? "text-[8px]" : isDiagonal ? "text-[10px]" : "text-[11px]"
           )}>
             {SUBJECT_TYPE_LABELS[event.subject_type]}
+            {event.group_number && ` • Гр. ${event.group_number}`}
           </div>
         )}
         
