@@ -131,10 +131,7 @@ export function ScheduleCell({
         rowSpan={rowSpan}
       >
         <div className="diagonal-container">
-          {/* Diagonal divider line */}
-          <div className="diagonal-line" />
-          
-          {/* ODD Week Triangle - Top-Left, clip-path: polygon(0 0, 100% 0, 0 100%) */}
+          {/* ODD Week Triangle - Top-Left */}
           <div className="diagonal-odd">
             {hasOdd ? (
               <div className="diagonal-event-wrapper">
@@ -152,7 +149,7 @@ export function ScheduleCell({
             <div className="week-badge odd-badge">Нечетна</div>
           </div>
           
-          {/* EVEN Week Triangle - Bottom-Right, clip-path: polygon(100% 0, 100% 100%, 0 100%) */}
+          {/* EVEN Week Triangle - Bottom-Right */}
           <div className="diagonal-even">
             {hasEven ? (
               <div className="diagonal-event-wrapper">

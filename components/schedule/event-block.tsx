@@ -50,13 +50,16 @@ export function EventBlock({
         onClick();
       }}
     >
-      {/* Main content area */}
-      <div className="flex-1 flex flex-col min-h-0 z-10 gap-0.5 overflow-hidden">
-        {/* Subject Name - LARGE & BOLD */}
+      {/* Main content area - Order: Subject Name > Room > Group */}
+      <div className={cn(
+        "flex-1 flex flex-col min-h-0 z-10 gap-0.5 overflow-hidden",
+        isDiagonal && event.week_cycle === 'even' && "justify-end"
+      )}>
+        {/* Subject Name - LARGE & BOLD (Top) */}
         <div className={cn(
           "font-bold text-slate-900 break-words tracking-tight hyphens-auto leading-tight",
           isCompact || isDiagonal
-            ? "text-[11px] line-clamp-2" 
+            ? "text-[10px] line-clamp-2" 
             : "text-[16px] line-clamp-3"
         )}
         style={{ wordBreak: 'break-word' }}
@@ -64,23 +67,21 @@ export function EventBlock({
           {event.subject_name}
         </div>
         
+        {/* Room Number */}
+        <div className={cn(
+          "font-normal text-slate-600",
+          isCompact || isDiagonal ? "text-[9px]" : "text-[13px]"
+        )}>
+          {event.room || '-'}
+        </div>
+        
         {/* For makeup events: show session type */}
         {isMakeup && (
           <div className={cn(
             "font-semibold text-slate-700",
-            isCompact || isDiagonal ? "text-[9px]" : "text-[11px]"
+            isCompact || isDiagonal ? "text-[8px]" : "text-[11px]"
           )}>
             {SUBJECT_TYPE_LABELS[event.subject_type]}
-          </div>
-        )}
-        
-        {/* Room Number - normal weight */}
-        {!isDiagonal && (
-          <div className={cn(
-            "font-normal text-slate-600",
-            isCompact ? "text-[10px]" : "text-[13px]"
-          )}>
-            {event.room || '-'}
           </div>
         )}
         
@@ -92,10 +93,11 @@ export function EventBlock({
         )}
       </div>
 
-      {/* TAGS AREA - Bottom row with strict positioning */}
+      {/* TAGS AREA - Bottom row with strict positioning (hidden in diagonal mode) */}
+      {!isDiagonal && (
       <div className={cn(
         "absolute left-1 right-1 flex justify-between items-end pointer-events-none z-20",
-        isDiagonal ? "bottom-0.5" : "bottom-1.5"
+        "bottom-1.5"
       )}>
         {/* LEFT: Subgroup tag or Week Badge */}
         <div className="flex gap-1">
@@ -129,6 +131,7 @@ export function EventBlock({
           )}
         </div>
       </div>
+      )}
     </div>
   );
 }
