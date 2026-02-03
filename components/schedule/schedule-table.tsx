@@ -133,9 +133,9 @@ export function ScheduleTable({ onCellClick, onEventClick }: ScheduleTableProps)
   };
 
   return (
-    <div className="flex-1 overflow-auto scrollbar-thin">
-      <div className="min-w-max">
-        <table className="w-full border-collapse bg-card">
+    <div className="h-full w-full overflow-auto scrollbar-thin">
+      <div className="min-w-[700px]">
+        <table className="w-full border-collapse bg-card table-fixed">
           <thead className="sticky top-0 z-10">
             <tr className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800 shadow-lg">
               <th className="w-28 px-4 py-5 text-center text-white font-semibold text-sm tracking-wide border-r border-slate-600/50 rounded-tl-lg">

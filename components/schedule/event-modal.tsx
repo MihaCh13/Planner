@@ -11,7 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useScheduleStore } from '@/lib/schedule-store';
 import { TIME_SLOTS, DAYS, DAY_NAMES } from '@/lib/schedule-types';
 import type { ScheduleEvent } from '@/lib/schedule-types';
-import { Save, Trash2, X, FileText, Clock, Settings, AlertTriangle } from 'lucide-react';
+import { Save, Trash2, X, FileText, Clock, Settings, AlertTriangle, RotateCcw } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 
 interface EventModalProps {
   isOpen: boolean;
@@ -34,6 +35,7 @@ export function EventModal({
 }: EventModalProps) {
   const { addEvent, updateEvent, deleteEvent } = useScheduleStore();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isMakeupMode, setIsMakeupMode] = useState(isMakeup);
 
   const [formData, setFormData] = useState({
     subject_name: '',
@@ -66,6 +68,7 @@ export function EventModal({
         event_type: event.event_type,
         group_number: event.group_number || ''
       });
+      setIsMakeupMode(event.event_type === 'makeup');
     } else {
       setFormData({
         subject_name: '',
@@ -81,6 +84,7 @@ export function EventModal({
         event_type: isMakeup ? 'makeup' : 'regular',
         group_number: ''
       });
+      setIsMakeupMode(isMakeup);
     }
     setShowDeleteConfirm(false);
   }, [event, defaultDay, defaultStartTime, defaultEndTime, isMakeup, isOpen]);
@@ -121,6 +125,35 @@ export function EventModal({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-8">
+          {/* Makeup Toggle */}
+          <div className={`p-4 rounded-xl border-2 transition-all ${isMakeupMode ? 'bg-[#c7fff1]/30 border-[#a8efe0]' : 'bg-muted/30 border-border'}`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <RotateCcw className={`w-5 h-5 ${isMakeupMode ? 'text-teal-600' : 'text-muted-foreground'}`} />
+                <div>
+                  <Label htmlFor="makeup-toggle" className="font-bold text-base cursor-pointer">
+                    Отработване
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Маркирай като отработване на пропуснат час
+                  </p>
+                </div>
+              </div>
+              <Switch
+                id="makeup-toggle"
+                checked={isMakeupMode}
+                onCheckedChange={(checked) => {
+                  setIsMakeupMode(checked);
+                  setFormData(prev => ({
+                    ...prev,
+                    event_type: checked ? 'makeup' : 'regular',
+                    subject_type: checked && prev.subject_type === 'lecture' ? 'seminar' : prev.subject_type
+                  }));
+                }}
+              />
+            </div>
+          </div>
+
           {/* Section 1: Basic Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
@@ -155,7 +188,7 @@ export function EventModal({
                     <SelectValue placeholder="Изберете тип" />
                   </SelectTrigger>
                   <SelectContent>
-                    {!isMakeup && <SelectItem value="lecture">Лекция</SelectItem>}
+                    {!isMakeupMode && <SelectItem value="lecture">Лекция</SelectItem>}
                     <SelectItem value="seminar">Семинарно упражнение</SelectItem>
                     <SelectItem value="lab">Лабораторно упражнение</SelectItem>
                   </SelectContent>
@@ -278,7 +311,7 @@ export function EventModal({
               Допълнително
             </h3>
             
-            {!isMakeup && (
+            {!isMakeupMode && (
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="control_form" className="font-semibold">
@@ -323,7 +356,7 @@ export function EventModal({
               </div>
             )}
 
-            {isMakeup ? (
+            {isMakeupMode ? (
               <div className="space-y-2">
                 <Label htmlFor="group_number" className="font-semibold">
                   Номер на група

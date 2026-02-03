@@ -20,12 +20,13 @@ export function ScheduleCell({
   rowSpan = 1,
   height = 100
 }: ScheduleCellProps) {
-  const regularEvents = events.filter(e => e.event_type !== 'makeup');
-  const oddWeekEvents = regularEvents.filter(e => e.week_cycle === 'odd');
-  const evenWeekEvents = regularEvents.filter(e => e.week_cycle === 'even');
-  const everyWeekEvents = regularEvents.filter(e => e.week_cycle === 'every');
+  // Separate events by week cycle
+  const oddWeekEvents = events.filter(e => e.week_cycle === 'odd');
+  const evenWeekEvents = events.filter(e => e.week_cycle === 'even');
+  const everyWeekEvents = events.filter(e => e.week_cycle === 'every');
 
   const isEmpty = events.length === 0;
+  const totalEventCount = events.length;
 
   // Render empty cell
   if (isEmpty) {
@@ -43,8 +44,8 @@ export function ScheduleCell({
     );
   }
 
-  // Single event for every week - FULL CELL
-  if (everyWeekEvents.length > 0 && oddWeekEvents.length === 0 && evenWeekEvents.length === 0) {
+  // Case C: Single "Every Week" Event - FULL Block
+  if (everyWeekEvents.length === 1 && oddWeekEvents.length === 0 && evenWeekEvents.length === 0) {
     return (
       <td 
         className="schedule-cell border border-border p-0"
@@ -52,95 +53,42 @@ export function ScheduleCell({
         rowSpan={rowSpan}
       >
         <div className="h-full w-full">
-          {everyWeekEvents.map((event) => (
-            <EventBlock 
-              key={event.id} 
-              event={event} 
-              onClick={() => onEventClick(event)} 
-            />
-          ))}
+          <EventBlock 
+            event={everyWeekEvents[0]} 
+            onClick={() => onEventClick(everyWeekEvents[0])} 
+          />
         </div>
       </td>
     );
   }
 
-  // Check for odd/even alternation
-  const hasOdd = oddWeekEvents.length > 0;
-  const hasEven = evenWeekEvents.length > 0;
-
-  // HORIZONTAL SPLIT for ODD/EVEN - Safe zones, no overlap
-  if (hasOdd && hasEven) {
+  // Multiple "every week" events - use grid
+  if (everyWeekEvents.length > 1 && oddWeekEvents.length === 0 && evenWeekEvents.length === 0) {
     return (
       <td 
         className="schedule-cell border border-border p-0"
         style={{ height: `${height}px` }}
         rowSpan={rowSpan}
       >
-        <div className="split-container">
-          {/* TOP HALF - ODD WEEK */}
-          <div className="split-top">
-            <div className="split-label odd-label">Нечетна</div>
-            <div className="split-content">
-              {oddWeekEvents.length === 1 ? (
-                <EventBlock 
-                  event={oddWeekEvents[0]} 
-                  isCompact
-                  onClick={() => onEventClick(oddWeekEvents[0])} 
-                />
-              ) : (
-                <div className="flex gap-0.5 w-full h-full">
-                  {oddWeekEvents.slice(0, 2).map((event) => (
-                    <div key={event.id} className="flex-1 min-w-0">
-                      <EventBlock 
-                        event={event} 
-                        isCompact
-                        onClick={() => onEventClick(event)} 
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
+        <div className="grid-2x2">
+          {everyWeekEvents.slice(0, 4).map((event, idx) => (
+            <div key={event.id} className={cn("grid-quadrant", `q${idx + 1}`)}>
+              <EventBlock 
+                event={event} 
+                isCompact
+                onClick={() => onEventClick(event)} 
+              />
             </div>
-          </div>
-          
-          {/* DIVIDER LINE */}
-          <div className="split-divider" />
-          
-          {/* BOTTOM HALF - EVEN WEEK */}
-          <div className="split-bottom">
-            <div className="split-label even-label">Четна</div>
-            <div className="split-content">
-              {evenWeekEvents.length === 1 ? (
-                <EventBlock 
-                  event={evenWeekEvents[0]} 
-                  isCompact
-                  onClick={() => onEventClick(evenWeekEvents[0])} 
-                />
-              ) : (
-                <div className="flex gap-0.5 w-full h-full">
-                  {evenWeekEvents.slice(0, 2).map((event) => (
-                    <div key={event.id} className="flex-1 min-w-0">
-                      <EventBlock 
-                        event={event} 
-                        isCompact
-                        onClick={() => onEventClick(event)} 
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+          ))}
         </div>
       </td>
     );
   }
 
-  // Single week type only (odd OR even, but not both)
-  if (hasOdd || hasEven) {
-    const weekEvents = hasOdd ? oddWeekEvents : evenWeekEvents;
-    const weekType = hasOdd ? 'odd' : 'even';
-    const label = hasOdd ? 'Нечетна' : 'Четна';
+  // Case A: 3 or more events - Use 2x2 GRID Layout
+  if (totalEventCount >= 3) {
+    // Combine all events and take up to 4
+    const allEvents = [...oddWeekEvents, ...evenWeekEvents, ...everyWeekEvents].slice(0, 4);
     
     return (
       <td 
@@ -148,36 +96,82 @@ export function ScheduleCell({
         style={{ height: `${height}px` }}
         rowSpan={rowSpan}
       >
-        <div className={cn("single-week-container", weekType)}>
-          <div className={cn("split-label", weekType === 'odd' ? 'odd-label' : 'even-label')}>
-            {label}
-          </div>
-          <div className="single-week-content">
-            {weekEvents.length === 1 ? (
+        <div className="grid-2x2">
+          {allEvents.map((event, idx) => (
+            <div key={event.id} className={cn("grid-quadrant", `q${idx + 1}`)}>
               <EventBlock 
-                event={weekEvents[0]} 
-                onClick={() => onEventClick(weekEvents[0])} 
+                event={event} 
+                isCompact
+                showWeekBadge
+                onClick={() => onEventClick(event)} 
               />
-            ) : (
-              <div className="flex gap-0.5 w-full h-full">
-                {weekEvents.slice(0, 2).map((event) => (
-                  <div key={event.id} className="flex-1 min-w-0">
-                    <EventBlock 
-                      event={event} 
-                      isCompact
-                      onClick={() => onEventClick(event)} 
-                    />
-                  </div>
-                ))}
+            </div>
+          ))}
+          {/* Fill empty quadrants if less than 4 events */}
+          {allEvents.length < 4 && Array.from({ length: 4 - allEvents.length }).map((_, idx) => (
+            <div 
+              key={`empty-${idx}`} 
+              className={cn("grid-quadrant empty", `q${allEvents.length + idx + 1}`)}
+            />
+          ))}
+        </div>
+      </td>
+    );
+  }
+
+  // Case B: Odd/Even Week Split (1 or 2 events) - Use DIAGONAL Layout
+  const hasOdd = oddWeekEvents.length > 0;
+  const hasEven = evenWeekEvents.length > 0;
+
+  if ((hasOdd || hasEven) && totalEventCount <= 2) {
+    return (
+      <td 
+        className="schedule-cell border border-border p-0"
+        style={{ height: `${height}px` }}
+        rowSpan={rowSpan}
+      >
+        <div className="diagonal-container">
+          {/* ODD Week Triangle - Top-Left */}
+          <div className="diagonal-odd">
+            {hasOdd ? (
+              <div className="diagonal-event-wrapper">
+                <EventBlock 
+                  event={oddWeekEvents[0]} 
+                  isCompact
+                  isDiagonal
+                  onClick={() => onEventClick(oddWeekEvents[0])} 
+                />
               </div>
+            ) : (
+              <div className="diagonal-empty" />
             )}
+            {/* ODD Week Badge - Top-Left */}
+            <div className="week-badge odd-badge">Нечетна</div>
+          </div>
+          
+          {/* EVEN Week Triangle - Bottom-Right */}
+          <div className="diagonal-even">
+            {hasEven ? (
+              <div className="diagonal-event-wrapper">
+                <EventBlock 
+                  event={evenWeekEvents[0]} 
+                  isCompact
+                  isDiagonal
+                  onClick={() => onEventClick(evenWeekEvents[0])} 
+                />
+              </div>
+            ) : (
+              <div className="diagonal-empty" />
+            )}
+            {/* EVEN Week Badge - Bottom-Right */}
+            <div className="week-badge even-badge">Четна</div>
           </div>
         </div>
       </td>
     );
   }
 
-  // Fallback: render all events
+  // Fallback: render all events in a flex column
   return (
     <td 
       className="schedule-cell border border-border p-1"
@@ -190,6 +184,7 @@ export function ScheduleCell({
             key={event.id} 
             event={event} 
             isCompact
+            showWeekBadge
             onClick={() => onEventClick(event)} 
           />
         ))}
