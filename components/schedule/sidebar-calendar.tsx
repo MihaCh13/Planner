@@ -286,13 +286,13 @@ export function SidebarCalendar() {
   }, [calendarConfig, semester]);
 
   const semesterStart = useMemo(() => {
-    if (!calendarConfig) return new Date();
+    if (!calendarConfig) return new Date(2025, 0, 1); // Stable fallback date
     const semesterKey = semester === 'winter' ? 'winterSemester' : 'summerSemester';
     return new Date(calendarConfig[semesterKey].start);
   }, [calendarConfig, semester]);
 
   const semesterEnd = useMemo(() => {
-    if (!calendarConfig) return new Date();
+    if (!calendarConfig) return new Date(2025, 0, 1); // Stable fallback date
     const semesterKey = semester === 'winter' ? 'winterSemester' : 'summerSemester';
     return new Date(calendarConfig[semesterKey].end);
   }, [calendarConfig, semester]);
