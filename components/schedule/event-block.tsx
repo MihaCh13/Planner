@@ -1,8 +1,15 @@
 'use client';
 
 import type { ScheduleEvent } from '@/lib/schedule-types';
-import { CONTROL_FORMS, PROJECT_TYPES, SUBGROUP_LABELS, SUBJECT_TYPE_LABELS } from '@/lib/schedule-types';
+import { CONTROL_FORMS, PROJECT_TYPES, SUBGROUP_LABELS } from '@/lib/schedule-types';
 import { cn } from '@/lib/utils';
+
+// Abbreviations for makeup events
+const MAKEUP_ABBREVIATIONS: Record<string, string> = {
+  lecture: '(Л)',
+  seminar: '(СУ)',
+  lab: '(ЛУ)'
+};
 
 interface EventBlockProps {
   event: ScheduleEvent;
@@ -77,14 +84,14 @@ export function EventBlock({
           {event.room || '-'}
         </div>
         
-        {/* For makeup events: show session type and group */}
+        {/* For makeup events: show abbreviated session type and group */}
         {isMakeup && (
           <div className={cn(
             "font-bold text-slate-700 overflow-hidden text-ellipsis whitespace-nowrap",
-            isCompact ? "text-[9px]" : isDiagonal ? "text-[11px]" : "text-[11px]"
+            isCompact ? "text-[10px]" : isDiagonal ? "text-[12px]" : "text-[12px]"
           )}>
-            {SUBJECT_TYPE_LABELS[event.subject_type]}
-            {event.group_number && ` • Гр. ${event.group_number}`}
+            {MAKEUP_ABBREVIATIONS[event.subject_type] || ''}
+            {event.group_number && ` Гр. ${event.group_number}`}
           </div>
         )}
         
@@ -123,7 +130,7 @@ export function EventBlock({
         {/* RIGHT: Project tag or Group number for makeup */}
         <div className="flex gap-1">
           {showProject && (
-            <span className={cn("glassy-badge", isDiagonal && "mini")}>
+            <span className={cn("glassy-badge project-badge", isDiagonal && "mini")}>
               {PROJECT_TYPES[event.project_type]}
             </span>
           )}

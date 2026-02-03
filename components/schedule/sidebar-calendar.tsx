@@ -182,6 +182,13 @@ export function SidebarCalendar() {
     setIsHydrated(true);
   }, []);
 
+  // Calculate scale factor based on sidebar width (300 = base, 450 = max)
+  const scaleFactor = useMemo(() => {
+    if (sidebarWidth <= 300) return 1;
+    if (sidebarWidth >= 450) return 1.35;
+    return 1 + ((sidebarWidth - 300) / 150) * 0.35;
+  }, [sidebarWidth]);
+
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     setIsResizing(true);
@@ -515,46 +522,81 @@ export function SidebarCalendar() {
         )}
       </div>
 
-      {/* Compact Legend */}
-      <div className="flex flex-col gap-1.5 pt-2 border-t border-border">
-        <div className="font-bold text-[8px] text-foreground uppercase tracking-wider flex items-center gap-1">
-          <Pin className="w-2.5 h-2.5" />
+      {/* Responsive Legend - scales with sidebar width */}
+      <div 
+        className="flex flex-col gap-1.5 pt-2 border-t border-border transition-all"
+        style={{ fontSize: `${8 * scaleFactor}px` }}
+      >
+        <div 
+          className="font-bold text-foreground uppercase tracking-wider flex items-center gap-1"
+          style={{ fontSize: `${8 * scaleFactor}px` }}
+        >
+          <Pin style={{ width: `${10 * scaleFactor}px`, height: `${10 * scaleFactor}px` }} />
           Обозначения
         </div>
         
-        <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-[8px]">
-          <div className="flex items-center gap-1 text-muted-foreground font-medium">
-            <div className="w-2.5 h-2.5 rounded-sm bg-blue-100 border border-blue-300" />
+        <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+          <div className="flex items-center gap-1.5 text-muted-foreground font-medium">
+            <div 
+              className="rounded-sm" 
+              style={{ 
+                width: `${10 * scaleFactor}px`, 
+                height: `${10 * scaleFactor}px`,
+                backgroundColor: '#85daff'
+              }} 
+            />
             <span>Нечетна</span>
           </div>
           
-          <div className="flex items-center gap-1 text-muted-foreground font-medium">
-            <div className="w-2.5 h-2.5 rounded-sm bg-purple-100 border border-purple-300" />
+          <div className="flex items-center gap-1.5 text-muted-foreground font-medium">
+            <div 
+              className="rounded-sm" 
+              style={{ 
+                width: `${10 * scaleFactor}px`, 
+                height: `${10 * scaleFactor}px`,
+                backgroundColor: '#ff9ec6'
+              }} 
+            />
             <span>Четна</span>
           </div>
           
-          <div className="flex items-center gap-1 text-muted-foreground font-medium">
-            <div className="w-2.5 h-2.5 rounded-sm ring-1 ring-red-500 ring-inset" />
+          <div className="flex items-center gap-1.5 text-muted-foreground font-medium">
+            <div 
+              className="rounded-sm ring-1 ring-red-500 ring-inset" 
+              style={{ width: `${10 * scaleFactor}px`, height: `${10 * scaleFactor}px` }} 
+            />
             <span>Почивен</span>
           </div>
           
-          <div className="flex items-center gap-1 text-muted-foreground font-medium">
-            <div className="w-2.5 h-2.5 rounded-sm bg-emerald-100 ring-1 ring-emerald-500 ring-inset" />
+          <div className="flex items-center gap-1.5 text-muted-foreground font-medium">
+            <div 
+              className="rounded-sm bg-emerald-100 ring-1 ring-emerald-500 ring-inset" 
+              style={{ width: `${10 * scaleFactor}px`, height: `${10 * scaleFactor}px` }} 
+            />
             <span>Ваканция</span>
           </div>
           
-          <div className="flex items-center gap-1 text-muted-foreground font-medium">
-            <div className="w-4 h-0.5 bg-orange-500 rounded-sm" />
+          <div className="flex items-center gap-1.5 text-muted-foreground font-medium">
+            <div 
+              className="bg-orange-500 rounded-sm" 
+              style={{ width: `${16 * scaleFactor}px`, height: `${2 * scaleFactor}px` }} 
+            />
             <span>Редовна</span>
           </div>
           
-          <div className="flex items-center gap-1 text-muted-foreground font-medium">
-            <div className="w-4 h-0.5 bg-purple-500 rounded-sm" />
+          <div className="flex items-center gap-1.5 text-muted-foreground font-medium">
+            <div 
+              className="bg-purple-500 rounded-sm" 
+              style={{ width: `${16 * scaleFactor}px`, height: `${2 * scaleFactor}px` }} 
+            />
             <span>Поправка</span>
           </div>
           
-          <div className="flex items-center gap-1 text-muted-foreground font-medium col-span-2">
-            <div className="w-4 h-0.5 bg-pink-500 rounded-sm" />
+          <div className="flex items-center gap-1.5 text-muted-foreground font-medium col-span-2">
+            <div 
+              className="bg-pink-500 rounded-sm" 
+              style={{ width: `${16 * scaleFactor}px`, height: `${2 * scaleFactor}px` }} 
+            />
             <span>Ликвидация</span>
           </div>
         </div>

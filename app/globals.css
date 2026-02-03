@@ -178,53 +178,73 @@
   transform: translateY(-1px);
 }
 
-/* Event background colors */
+/* Event background colors - ALL with visible darker borders */
 .lecture-bg {
   background: linear-gradient(135deg, var(--lecture) 0%, var(--lecture-dark) 100%);
+  border: 2px solid oklch(0.65 0.12 145);
 }
 
 .seminar-bg {
   background: linear-gradient(135deg, var(--seminar) 0%, var(--seminar-dark) 100%);
+  border: 2px solid oklch(0.7 0.14 45);
 }
 
 .lab-bg {
   background: linear-gradient(135deg, var(--lab) 0%, var(--lab-dark) 100%);
+  border: 2px solid oklch(0.65 0.12 280);
 }
 
 .makeup-bg {
   background: linear-gradient(135deg, var(--makeup) 0%, var(--makeup-dark) 100%);
+  border: 2px solid #5fcfb8;
 }
 
 .lunch-bg {
   background: linear-gradient(135deg, var(--lunch) 0%, var(--lunch-dark) 100%);
+  border: 2px solid oklch(0.85 0.04 90);
 }
 
 /* =====================================================
    GLASSY BADGE (Tags) - LARGE & CLEAR
    ===================================================== */
+/* Glassy Badge - Glassmorphism with LARGE & PROMINENT styling */
 .glassy-badge {
   display: inline-block;
-  padding: 3px 7px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 700;
-  color: #1e293b;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #0f172a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8);
   white-space: nowrap;
-  letter-spacing: 0.02em;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.03em;
+  border: 1px solid rgba(255, 255, 255, 0.6);
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
 }
 
 .glassy-badge.mini {
-  padding: 2px 5px;
-  font-size: 8px;
-  border-radius: 3px;
+  padding: 2px 6px;
+  font-size: 9px;
+  border-radius: 4px;
+}
+
+/* Project Label - Extra Large & Prominent */
+.glassy-badge.project-badge {
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 900;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 /* =====================================================
@@ -321,6 +341,22 @@
   width: 100%;
   background: transparent;
   overflow: hidden;
+}
+
+/* Visible diagonal dividing line */
+.diagonal-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 141.42%;
+  height: 2px;
+  background: rgba(0, 0, 0, 0.25);
+  transform-origin: 0 0;
+  transform: rotate(45deg);
+  z-index: 10;
+  top: 100%;
+  pointer-events: none;
 }
 
 /* ODD Week Triangle - Top-Left 
