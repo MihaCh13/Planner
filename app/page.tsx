@@ -46,12 +46,14 @@ export default function SchedulePlanner() {
       <Header onAddEvent={handleAddEvent} />
       <Legend />
       
-      <div className="flex flex-1 gap-4 px-6 py-4 overflow-hidden">
+      <div className="flex flex-1 gap-4 px-4 md:px-6 py-4 overflow-hidden min-w-0">
         <SidebarCalendar />
-        <ScheduleTable 
-          onCellClick={handleCellClick}
-          onEventClick={handleEventClick}
-        />
+        <div className="flex-1 min-w-0 overflow-hidden">
+          <ScheduleTable 
+            onCellClick={handleCellClick}
+            onEventClick={handleEventClick}
+          />
+        </div>
       </div>
 
       <EventModal
