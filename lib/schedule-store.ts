@@ -306,7 +306,6 @@ export const useScheduleStore = create<ScheduleStore>()(
       removeHoliday: (date) => set((state) => ({ 
         holidays: state.holidays.filter(d => d !== date) 
       })),
-      vacations: [],
       addVacation: (date) => set((state) => ({ 
         vacations: state.vacations.includes(date) ? state.vacations : [...state.vacations, date] 
       })),
