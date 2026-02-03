@@ -175,6 +175,12 @@ export function SidebarCalendar() {
   const [sidebarWidth, setSidebarWidth] = useState(300);
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
+  
+  // Wait for hydration to complete before rendering to prevent mismatch
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -348,6 +354,19 @@ export function SidebarCalendar() {
     
     return ranges;
   }, [calendarConfig, semester]);
+
+  // Show loading skeleton during hydration to prevent mismatch
+  if (!isHydrated) {
+    return (
+      <div className="w-[300px] bg-card/80 backdrop-blur-md rounded-2xl shadow-lg p-4 flex flex-col items-center justify-center gap-4 flex-shrink-0">
+        <div className="animate-pulse space-y-3 w-full">
+          <div className="h-8 bg-muted rounded w-full" />
+          <div className="h-24 bg-muted rounded w-full" />
+          <div className="h-24 bg-muted rounded w-full" />
+        </div>
+      </div>
+    );
+  }
 
   // No calendar configured - show Add Calendar button
   if (!calendarConfig) {
