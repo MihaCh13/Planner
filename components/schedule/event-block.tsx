@@ -57,51 +57,90 @@ export function EventBlock({
         onClick();
       }}
     >
-      {/* Main content area - Order: Subject Name > Room > Group */}
-      <div className={cn(
-        "flex-1 flex flex-col min-h-0 z-10 gap-0.5 overflow-hidden",
-        isDiagonal && event.week_cycle === 'even' && "justify-end"
-      )}>
-        {/* Subject Name - LARGE & BOLD (Top) */}
-        <div className={cn(
-          "text-slate-900 break-words tracking-tight hyphens-auto leading-tight overflow-hidden text-ellipsis",
-          isCompact 
-            ? "text-[11px] font-bold line-clamp-2"
-            : isDiagonal 
-              ? "text-[14px] font-extrabold line-clamp-2"
-              : "text-[16px] font-bold line-clamp-3"
-        )}
-        style={{ wordBreak: 'break-word' }}
+      {/* Main content area - Different layouts for diagonal vs regular */}
+      {isDiagonal ? (
+        // DIAGONAL MODE: Flex layout with minimal padding to maximize text space
+        <div
+          className={cn(
+            "absolute w-full h-full z-10 flex flex-col gap-0.5",
+            event.week_cycle === 'odd'
+              ? 'top-0 left-0 items-start justify-start pt-[22px] pl-1 pr-2 w-[90%]'
+              : 'bottom-0 right-0 items-end justify-end pb-[22px] pr-1 pl-2 w-[90%]'
+          )}
         >
-          {event.subject_name}
+          {/* Subject Name - LARGE & BOLD */}
+          <div
+            className={cn(
+              "text-slate-900 font-bold leading-3 line-clamp-2 break-words text-[11px]",
+              event.week_cycle === 'even' && 'text-right'
+            )}
+          >
+            {event.subject_name}
+          </div>
+
+          {/* Room Number & Makeup Indicator - Smaller, grouped together */}
+          <div
+            className={cn(
+              "text-slate-700 font-medium leading-3 text-[10px]",
+              event.week_cycle === 'even' ? 'text-right whitespace-nowrap' : 'whitespace-nowrap'
+            )}
+          >
+            {event.room && <span>{event.room}</span>}
+            {isMakeup && (
+              <span>
+                {event.room && ' • '}
+                {MAKEUP_ABBREVIATIONS[event.subject_type] || ''}
+                {event.group_number && ` Гр. ${event.group_number}`}
+              </span>
+            )}
+            {!event.room && !isMakeup && <span>-</span>}
+          </div>
         </div>
-        
-        {/* Room Number */}
+      ) : (
+        // NON-DIAGONAL MODE: Flex layout as before
         <div className={cn(
-          "font-semibold text-slate-700 overflow-hidden text-ellipsis whitespace-nowrap",
-          isCompact ? "text-[10px]" : isDiagonal ? "text-[12px]" : "text-[13px]"
+          "flex-1 flex flex-col min-h-0 z-10 gap-0.5 overflow-hidden",
+          event.week_cycle === 'even' && "justify-end"
         )}>
-          {event.room || '-'}
-        </div>
-        
-        {/* For makeup events: show abbreviated session type and group */}
-        {isMakeup && (
+          {/* Subject Name - LARGE & BOLD (Top) */}
           <div className={cn(
-            "font-bold text-slate-700 overflow-hidden text-ellipsis whitespace-nowrap",
-            isCompact ? "text-[10px]" : isDiagonal ? "text-[12px]" : "text-[12px]"
+            "text-slate-900 break-words tracking-tight hyphens-auto whitespace-normal overflow-hidden",
+            isCompact 
+              ? "text-[11px] font-bold line-clamp-2"
+              : "text-[16px] font-bold line-clamp-3"
+          )}
+          style={{ wordBreak: 'break-word' }}
+          >
+            {event.subject_name}
+          </div>
+          
+          {/* Room Number */}
+          <div className={cn(
+            "font-semibold text-slate-700 overflow-hidden text-ellipsis whitespace-nowrap",
+            isCompact ? "text-[10px]" : "text-[13px]"
           )}>
-            {MAKEUP_ABBREVIATIONS[event.subject_type] || ''}
-            {event.group_number && ` Гр. ${event.group_number}`}
+            {event.room || '-'}
           </div>
-        )}
-        
-        {/* Control Form - italic in parentheses */}
-        {showControl && !isCompact && !isDiagonal && (
-          <div className="font-medium text-slate-500 text-[12px] italic">
-            ({CONTROL_FORMS[event.control_form]})
-          </div>
-        )}
-      </div>
+          
+          {/* For makeup events: show abbreviated session type and group */}
+          {isMakeup && (
+            <div className={cn(
+              "font-bold text-slate-700 overflow-hidden text-ellipsis whitespace-nowrap",
+              isCompact ? "text-[10px]" : "text-[12px]"
+            )}>
+              {MAKEUP_ABBREVIATIONS[event.subject_type] || ''}
+              {event.group_number && ` Гр. ${event.group_number}`}
+            </div>
+          )}
+          
+          {/* Control Form - italic in parentheses */}
+          {showControl && !isCompact && (
+            <div className="font-medium text-slate-500 text-[12px] italic">
+              ({CONTROL_FORMS[event.control_form]})
+            </div>
+          )}
+        </div>
+      )}
 
       {/* TAGS AREA - Bottom row with strict positioning (hidden in diagonal mode) */}
       {!isDiagonal && (

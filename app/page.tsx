@@ -1,8 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Header } from '@/components/schedule/header';
-import { Legend } from '@/components/schedule/legend';
 import { SidebarCalendar } from '@/components/schedule/sidebar-calendar';
 import { ScheduleTable } from '@/components/schedule/schedule-table';
 import { EventModal } from '@/components/schedule/event-modal';
@@ -43,15 +41,14 @@ export default function SchedulePlanner() {
 
   return (
     <div className="h-screen w-full flex flex-col overflow-hidden bg-gradient-to-br from-background via-blue-50/30 to-primary/5">
-      <Header onAddEvent={handleAddEvent} />
-      <Legend />
-      
-      <div className="flex flex-1 gap-4 px-4 md:px-6 py-4 overflow-hidden min-w-0">
+      {/* Main Content: Calendar Sidebar + Schedule Table */}
+      <div className="flex flex-1 gap-4 px-4 md:px-6 py-3 overflow-hidden min-w-0">
         <SidebarCalendar />
         <div className="flex-1 min-w-0 overflow-hidden">
           <ScheduleTable 
             onCellClick={handleCellClick}
             onEventClick={handleEventClick}
+            onAddEvent={handleAddEvent}
           />
         </div>
       </div>

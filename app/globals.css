@@ -248,17 +248,194 @@
 }
 
 /* =====================================================
+   SCHEDULE TABLE - STRICT CSS GRID LAYOUT
+   ===================================================== */
+
+/* Table wrapper - manages overall layout */
+.schedule-table-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Scrollbar hiding utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;             /* Chrome, Safari and Opera */
+}
+
+/* Phantom Shape for Diagonal Text Wrapping */
+.shape-phantom-odd {
+  float: right;
+  width: 100%;
+  height: 100%;
+  shape-outside: polygon(100% 0, 0 100%, 100% 100%);
+  clip-path: polygon(100% 0, 0 100%, 100% 100%);
+}
+
+.shape-phantom-even {
+  float: left;
+  width: 100%;
+  height: 100%;
+  shape-outside: polygon(0 0, 100% 0, 0 100%);
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+/* Grid container - enforces exact column and row distribution */
+.schedule-table-grid {
+  display: grid;
+  grid-template-columns: 80px repeat(5, 1fr);
+  grid-template-rows: auto repeat(12, 1fr);
+  gap: 0;
+  flex: 1;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Header cells - Time label + Day names */
+.schedule-header-time {
+  grid-column: 1;
+  grid-row: 1;
+  background: linear-gradient(to bottom right, #1e293b, #475569, #1e293b);
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1rem;
+  min-height: 50px;
+  border-right: 1px solid rgba(71, 85, 105, 0.5);
+  border-radius: 0.5rem 0 0 0;
+  z-index: 11;
+}
+
+.schedule-header-day {
+  background: linear-gradient(to bottom right, #1e293b, #475569, #1e293b);
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.75rem;
+  min-height: 50px;
+  border-right: 1px solid rgba(71, 85, 105, 0.5);
+  z-index: 11;
+}
+
+.schedule-header-day:nth-child(6) {
+  border-right: none;
+  border-radius: 0 0.5rem 0 0;
+}
+
+/* Time slot label cells */
+.schedule-time-label {
+  grid-column: 1;
+  background: linear-gradient(to right, #f5f3ff, #fafaf9);
+  color: #64748b;
+  font-weight: 600;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-right: 1px solid #d4d4d4;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Content cells - schedule events */
+.schedule-content-cell {
+  grid-column: auto;
+  position: relative;
+  border: 1px solid #d4d4d4;
+  overflow: hidden;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Lunch break row - spans all day columns */
+.schedule-lunch-label {
+  grid-column: 1;
+  grid-row: span 1;
+  background: linear-gradient(to right, #f5f3ff, #fafaf9);
+  color: #64748b;
+  font-weight: 600;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-right: 1px solid #d4d4d4;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.schedule-lunch-cell {
+  grid-column: auto;
+  background: linear-gradient(135deg, rgba(220, 252, 231, 0.8), rgba(240, 249, 255, 0.8));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  color: #166534;
+  font-weight: 600;
+  font-size: 0.75rem;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.1);
+}
+
+.schedule-lunch-cell svg {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+}
+
+/* Merged lunch cell - spans all day columns */
+.schedule-lunch-cell-merged {
+  grid-column: 2 / span 5;
+  /* background removed so Tailwind utility classes on the element control the gradient */
+  background: transparent;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  color: #166534;
+  font-weight: 600;
+  font-size: 0.875rem;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.schedule-lunch-cell-merged svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* =====================================================
    SCHEDULE CELL STYLES
    ===================================================== */
 .schedule-cell {
   position: relative;
   transition: all 0.15s ease;
   overflow: hidden;
-  height: 110px;
   padding: 0;
   margin: 0;
   box-sizing: border-box;
   vertical-align: top;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .schedule-cell.empty-cell:hover {
@@ -340,22 +517,20 @@
   height: 100%;
   width: 100%;
   background: transparent;
-  overflow: hidden;
+  overflow: visible; /* Allow rotated divider to render */
 }
 
-/* Visible diagonal dividing line */
-.diagonal-container::before {
-  content: '';
+/* Visible diagonal dividing line using SVG background image
+   The SVG line runs from bottom-left (0, 100%) to top-right (100%, 0%)
+   with preserveAspectRatio="none" to stretch perfectly to any cell aspect ratio.
+   The stroke color is injected dynamically from the component based on event type.
+   This ensures perfect corner-to-corner alignment regardless of cell height/width. */
+.diagonal-divider {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 141.42%;
-  height: 2px;
-  background: rgba(0, 0, 0, 0.25);
-  transform-origin: 0 0;
-  transform: rotate(45deg);
-  z-index: 10;
-  top: 100%;
+  inset: 0; /* Fill the entire container */
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  z-index: 14; /* above triangles (z-index:2) but below badges (z-index:15) */
   pointer-events: none;
 }
 

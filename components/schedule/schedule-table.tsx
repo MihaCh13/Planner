@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { cn } from "@/lib/utils"
 
 import { useMemo } from 'react';
@@ -7,14 +8,16 @@ import { TIME_SLOTS, DAYS, DAY_NAMES, getSlotIndex, getSlotCountBetween } from '
 import type { ScheduleEvent } from '@/lib/schedule-types';
 import { useScheduleStore } from '@/lib/schedule-store';
 import { ScheduleCell } from './schedule-cell';
+import { ScheduleToolbar } from './schedule-toolbar';
 import { UtensilsCrossed } from 'lucide-react';
 
 interface ScheduleTableProps {
   onCellClick: (day: string, startTime: string, endTime: string) => void;
   onEventClick: (event: ScheduleEvent) => void;
+  onAddEvent: () => void;
 }
 
-export function ScheduleTable({ onCellClick, onEventClick }: ScheduleTableProps) {
+export function ScheduleTable({ onCellClick, onEventClick, onAddEvent }: ScheduleTableProps) {
   const events = useScheduleStore((state) => state.events);
 
   // Group events by day and start slot
@@ -133,79 +136,65 @@ export function ScheduleTable({ onCellClick, onEventClick }: ScheduleTableProps)
   };
 
   return (
-    <div className="h-full w-full overflow-auto scrollbar-thin">
-      <div className="min-w-[700px]">
-        <table className="w-full border-collapse bg-card table-fixed">
-          <thead className="sticky top-0 z-10">
-            <tr className="bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800 shadow-lg">
-              <th className="w-28 px-4 py-5 text-center text-white font-semibold text-sm tracking-wide border-r border-slate-600/50 rounded-tl-lg">
-                <span className="opacity-90">Час</span>
-              </th>
-              {DAYS.map((day, idx) => (
-                <th 
-                  key={day}
-                  className={cn(
-                    "w-1/5 px-3 py-5 text-center text-white font-semibold text-sm tracking-wide border-r border-slate-600/50 last:border-r-0",
-                    idx === DAYS.length - 1 && "rounded-tr-lg"
-                  )}
+    <div className="schedule-table-wrapper flex flex-col">
+      <ScheduleToolbar onAddEvent={onAddEvent} />
+      <div className="schedule-table-grid">
+        {/* HEADER ROW */}
+        <div className="schedule-header-time">Час</div>
+        {DAYS.map((day) => (
+          <div key={`header-${day}`} className="schedule-header-day">
+            {DAY_NAMES[day]}
+          </div>
+        ))}
+
+        {/* CONTENT ROWS - Time slots and events */}
+        {TIME_SLOTS.map((slot, slotIdx) => {
+          if (slot.lunch) {
+            // LUNCH BREAK ROW - Merged cell spanning all day columns
+            return (
+              <React.Fragment key={`lunch-${slotIdx}`}>
+                <div className="schedule-lunch-label">
+                  {slot.start}–{slot.end}
+                </div>
+                <div
+                  className={"col-span-5 flex flex-row items-center justify-center gap-3 text-stone-900 bg-gradient-to-r from-[#ffbeb8]/40 to-[#ffd294]/40 backdrop-blur-md shadow-sm p-2 font-bold"}
                 >
-                  <span className="opacity-90">{DAY_NAMES[day]}</span>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {TIME_SLOTS.map((slot, slotIdx) => {
-              if (slot.lunch) {
+                  <UtensilsCrossed className="w-4 h-4" />
+                  <span>Обедна почивка</span>
+                </div>
+              </React.Fragment>
+            );
+          }
+
+          // CONTENT ROW - Time slot with events
+          return (
+            <React.Fragment key={`slot-${slotIdx}`}>
+              <div className="schedule-time-label">
+                {slot.start}–{slot.end}
+              </div>
+              {DAYS.map((day) => {
+                // Skip if this cell is covered by a rowspan from above
+                if (occupiedCells[day].has(slotIdx)) {
+                  return null;
+                }
+
+                const cellEvents = eventGrid[day]?.[slotIdx] || [];
+                const rowSpan = getRowSpan(day, slotIdx);
+
                 return (
-                  <tr key={`lunch-${slotIdx}`}>
-                    <td className="w-28 px-4 py-4 text-center text-sm font-bold bg-gradient-to-r from-muted to-muted/80 text-muted-foreground whitespace-nowrap">
-                      {slot.start}–{slot.end}
-                    </td>
-                    <td 
-                      colSpan={5} 
-                      className="lunch-bg"
-                      style={{ height: '60px' }}
-                    >
-                      <div className="h-full flex items-center justify-center gap-2 font-semibold text-slate-600">
-                        <UtensilsCrossed className="w-5 h-5" />
-                        <span>Обедна почивка</span>
-                      </div>
-                    </td>
-                  </tr>
+                  <ScheduleCell
+                    key={`${day}-${slotIdx}`}
+                    events={cellEvents}
+                    rowSpan={rowSpan}
+                    onCellClick={() => onCellClick(day, slot.start, slot.end)}
+                    onEventClick={onEventClick}
+                    gridRow={rowSpan}
+                  />
                 );
-              }
-
-              return (
-                <tr key={slotIdx}>
-                  <td className="w-28 px-4 py-4 text-center text-sm font-bold bg-gradient-to-r from-muted to-muted/80 text-muted-foreground whitespace-nowrap">
-                    {slot.start}–{slot.end}
-                  </td>
-                  {DAYS.map((day) => {
-                    // Skip if this cell is covered by a rowspan from above
-                    if (occupiedCells[day].has(slotIdx)) {
-                      return null;
-                    }
-
-                    const cellEvents = eventGrid[day]?.[slotIdx] || [];
-                    const rowSpan = getRowSpan(day, slotIdx);
-
-                    return (
-                      <ScheduleCell
-                        key={`${day}-${slotIdx}`}
-                        events={cellEvents}
-                        rowSpan={rowSpan}
-                        height={100 * rowSpan}
-                        onCellClick={() => onCellClick(day, slot.start, slot.end)}
-                        onEventClick={onEventClick}
-                      />
-                    );
-                  })}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              })}
+            </React.Fragment>
+          );
+        })}
       </div>
     </div>
   );

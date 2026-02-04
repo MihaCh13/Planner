@@ -5,12 +5,38 @@ import { EventBlock } from './event-block';
 import { Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+// Map event subject type to border color (must match CSS definitions)
+const getBorderColorForEvent = (event: ScheduleEvent): string => {
+  const isMakeup = event.event_type === 'makeup';
+  
+  if (isMakeup) {
+    return '#5fcfb8'; // makeup-bg border
+  }
+  
+  switch (event.subject_type) {
+    case 'lecture':
+      return 'oklch(0.65 0.12 145)'; // lecture-bg border
+    case 'seminar':
+      return 'oklch(0.7 0.14 45)'; // seminar-bg border
+    case 'lab':
+      return 'oklch(0.65 0.12 280)'; // lab-bg border
+    default:
+      return 'rgba(100,100,100,0.4)'; // fallback
+  }
+};
+
+// Generate SVG data URI with dynamic stroke color
+const generateDiagonalSvg = (strokeColor: string): string => {
+  const encodedColor = encodeURIComponent(strokeColor);
+  return `url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><line x1="0" y1="100" x2="100" y2="0" stroke="${encodedColor}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>')`;
+};
+
 interface ScheduleCellProps {
   events: ScheduleEvent[];
   onCellClick: () => void;
   onEventClick: (event: ScheduleEvent) => void;
   rowSpan?: number;
-  height?: number;
+  gridRow?: number;
 }
 
 export function ScheduleCell({ 
@@ -18,7 +44,7 @@ export function ScheduleCell({
   onCellClick, 
   onEventClick,
   rowSpan = 1,
-  height = 100
+  gridRow = 1,
 }: ScheduleCellProps) {
   // Separate events by week cycle
   const oddWeekEvents = events.filter(e => e.week_cycle === 'odd');
@@ -31,26 +57,24 @@ export function ScheduleCell({
   // Render empty cell
   if (isEmpty) {
     return (
-      <td 
-        className={cn("schedule-cell empty-cell border border-border")}
-        style={{ height: `${height}px` }}
-        rowSpan={rowSpan}
+      <div 
+        className={cn("schedule-content-cell schedule-cell empty-cell border border-border")}
+        style={{ gridRow: `span ${gridRow}` }}
         onClick={onCellClick}
       >
-        <div className="h-full flex items-center justify-center text-muted-foreground/40 text-sm font-medium cursor-pointer hover:text-muted-foreground/60 transition-colors">
-          <Plus className="w-5 h-5" />
+        <div className="h-full flex items-center justify-center text-muted-foreground/40 text-xs font-medium cursor-pointer hover:text-muted-foreground/60 transition-colors">
+          <Plus className="w-4 h-4" />
         </div>
-      </td>
+      </div>
     );
   }
 
   // Case C: Single "Every Week" Event - FULL Block
   if (everyWeekEvents.length === 1 && oddWeekEvents.length === 0 && evenWeekEvents.length === 0) {
     return (
-      <td 
-        className="schedule-cell border border-border p-0"
-        style={{ height: `${height}px` }}
-        rowSpan={rowSpan}
+      <div 
+        className="schedule-content-cell schedule-cell border border-border p-0"
+        style={{ gridRow: `span ${gridRow}` }}
       >
         <div className="h-full w-full">
           <EventBlock 
@@ -58,17 +82,16 @@ export function ScheduleCell({
             onClick={() => onEventClick(everyWeekEvents[0])} 
           />
         </div>
-      </td>
+      </div>
     );
   }
 
   // Multiple "every week" events - use grid
   if (everyWeekEvents.length > 1 && oddWeekEvents.length === 0 && evenWeekEvents.length === 0) {
     return (
-      <td 
-        className="schedule-cell border border-border p-0"
-        style={{ height: `${height}px` }}
-        rowSpan={rowSpan}
+      <div 
+        className="schedule-content-cell schedule-cell border border-border p-0"
+        style={{ gridRow: `span ${gridRow}` }}
       >
         <div className="grid-2x2">
           {everyWeekEvents.slice(0, 4).map((event, idx) => (
@@ -81,7 +104,7 @@ export function ScheduleCell({
             </div>
           ))}
         </div>
-      </td>
+      </div>
     );
   }
 
@@ -91,10 +114,9 @@ export function ScheduleCell({
     const allEvents = [...oddWeekEvents, ...evenWeekEvents, ...everyWeekEvents].slice(0, 4);
     
     return (
-      <td 
-        className="schedule-cell border border-border p-0"
-        style={{ height: `${height}px` }}
-        rowSpan={rowSpan}
+      <div 
+        className="schedule-content-cell schedule-cell border border-border p-0"
+        style={{ gridRow: `span ${gridRow}` }}
       >
         <div className="grid-2x2">
           {allEvents.map((event, idx) => (
@@ -115,7 +137,7 @@ export function ScheduleCell({
             />
           ))}
         </div>
-      </td>
+      </div>
     );
   }
 
@@ -125,10 +147,9 @@ export function ScheduleCell({
 
   if ((hasOdd || hasEven) && totalEventCount <= 2) {
     return (
-      <td 
-        className="schedule-cell border border-border p-0"
-        style={{ height: `${height}px` }}
-        rowSpan={rowSpan}
+      <div 
+        className="schedule-content-cell schedule-cell border border-border p-0"
+        style={{ gridRow: `span ${gridRow}` }}
       >
         <div className="diagonal-container">
           {/* ODD Week Triangle - Top-Left */}
@@ -166,17 +187,28 @@ export function ScheduleCell({
             {/* EVEN Week Badge - Bottom-Right */}
             <div className="week-badge even-badge">Четна</div>
           </div>
+          {/* Always-visible diagonal dividing line with dynamic color matching the event */}
+          <div 
+            className="diagonal-divider" 
+            aria-hidden 
+            style={{
+              backgroundImage: generateDiagonalSvg(
+                hasOdd ? getBorderColorForEvent(oddWeekEvents[0]) : 
+                hasEven ? getBorderColorForEvent(evenWeekEvents[0]) : 
+                'rgba(100,100,100,0.4)'
+              )
+            }}
+          />
         </div>
-      </td>
+      </div>
     );
   }
 
   // Fallback: render all events in a flex column
   return (
-    <td 
-      className="schedule-cell border border-border p-1"
-      style={{ height: `${height}px` }}
-      rowSpan={rowSpan}
+    <div 
+      className="schedule-content-cell schedule-cell border border-border p-1"
+      style={{ gridRow: `span ${gridRow}` }}
     >
       <div className="h-full flex flex-col gap-1 overflow-hidden">
         {events.map((event) => (
@@ -189,6 +221,6 @@ export function ScheduleCell({
           />
         ))}
       </div>
-    </td>
+    </div>
   );
 }

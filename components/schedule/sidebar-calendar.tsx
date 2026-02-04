@@ -229,6 +229,38 @@ export function SidebarCalendar() {
     removeVacation
   } = useScheduleStore();
 
+  // Calculate academic year from calendar config
+  const academicYear = useMemo(() => {
+    if (!calendarConfig) return null;
+    
+    try {
+      const winterStart = calendarConfig.winterSemester.start 
+        ? new Date(calendarConfig.winterSemester.start) 
+        : null;
+      const summerEnd = calendarConfig.summerSemester.end 
+        ? new Date(calendarConfig.summerSemester.end) 
+        : null;
+      
+      if (winterStart && summerEnd) {
+        const startYear = winterStart.getFullYear();
+        const endYear = summerEnd.getFullYear();
+        return `${startYear}/${endYear}`;
+      }
+      
+      if (winterStart) {
+        return `${winterStart.getFullYear()}/${winterStart.getFullYear() + 1}`;
+      }
+      
+      if (summerEnd) {
+        return `${summerEnd.getFullYear() - 1}/${summerEnd.getFullYear()}`;
+      }
+    } catch {
+      return null;
+    }
+    
+    return null;
+  }, [calendarConfig]);
+
   const handleDateClick = (date: Date) => {
     const dateKey = formatDateKey(date);
     
@@ -424,16 +456,16 @@ export function SidebarCalendar() {
       {/* Controls */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <span className="font-bold text-[10px] text-muted-foreground uppercase tracking-wider">
-            Семестър
+          <span className="font-bold text-sm text-foreground">
+            {academicYear ? `Учебна година ${academicYear}` : 'Учебна година'}
           </span>
           <button
             type="button"
-            onClick={() => clearCalendarConfig()}
-            className="text-[10px] text-muted-foreground hover:text-destructive flex items-center gap-1"
+            onClick={() => setIsConfigModalOpen(true)}
+            className="text-[10px] text-muted-foreground hover:text-primary flex items-center gap-1 transition-colors"
           >
-            <Trash2 className="w-3 h-3" />
-            Изтрий
+            <CalendarPlus className="w-3.5 h-3.5" />
+            Календар
           </button>
         </div>
         

@@ -315,7 +315,26 @@ export const useScheduleStore = create<ScheduleStore>()(
     }),
     {
       name: 'schedule-storage',
-      version: 2,
+      version: 3,
+      migrate: (persistedState: unknown, version: number) => {
+        // Handle migration from older versions to version 3
+        if (version < 3) {
+          const state = (persistedState as any) || {};
+          return {
+            events: state.events || [],
+            semester: state.semester || 'winter',
+            academicYear: state.academicYear || '2025/2026',
+            calendarConfig: state.calendarConfig || null,
+            holidays: state.holidays || [],
+            vacations: state.vacations || [
+              '2025-12-22', '2025-12-23', '2025-12-24', '2025-12-25', '2025-12-26', 
+              '2025-12-27', '2025-12-28', '2025-12-29', '2025-12-30', '2025-12-31', 
+              '2026-01-01', '2026-01-02', '2026-01-03', '2026-01-04'
+            ],
+          };
+        }
+        return persistedState as ScheduleStore;
+      },
     }
   )
 );
