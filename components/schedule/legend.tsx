@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
 import { ClipboardList, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { MAKEUP_STYLE, SEMINAR_STYLE, LAB_STYLE, LECTURE_STYLE } from './event-block';
 
 interface LegendProps {
   onAddEvent: () => void;
@@ -19,22 +20,22 @@ export function Legend({ onAddEvent }: LegendProps) {
           </span>
           
           <div className="flex items-center gap-1.5 md:gap-2">
-            <div className="w-4 h-4 md:w-5 md:h-5 rounded-md lecture-bg shadow-sm" />
+            <div className="w-4 h-4 md:w-5 md:h-5 rounded-md shadow-sm" style={LECTURE_STYLE} />
             <span className="text-xs md:text-sm text-foreground/80 font-medium">Лекция</span>
           </div>
           
           <div className="flex items-center gap-1.5 md:gap-2">
-            <div className="w-4 h-4 md:w-5 md:h-5 rounded-md seminar-bg shadow-sm" />
+            <div className="w-4 h-4 md:w-5 md:h-5 rounded-md shadow-sm" style={SEMINAR_STYLE} />
             <span className="text-xs md:text-sm text-foreground/80 font-medium">Семинарно</span>
           </div>
           
           <div className="flex items-center gap-1.5 md:gap-2">
-            <div className="w-4 h-4 md:w-5 md:h-5 rounded-md lab-bg shadow-sm" />
+            <div className="w-4 h-4 md:w-5 md:h-5 rounded-md shadow-sm" style={{ backgroundColor: '#E3D0FF', border: '1px solid #CEBDE6' }} />
             <span className="text-xs md:text-sm text-foreground/80 font-medium">Лабораторно</span>
           </div>
           
           <div className="flex items-center gap-1.5 md:gap-2">
-            <div className="w-4 h-4 md:w-5 md:h-5 rounded-md makeup-bg shadow-sm" />
+            <div className="w-4 h-4 md:w-5 md:h-5 rounded-md shadow-sm" style={MAKEUP_STYLE} />
             <span className="text-xs md:text-sm text-foreground/80 font-medium">Отработване</span>
           </div>
           

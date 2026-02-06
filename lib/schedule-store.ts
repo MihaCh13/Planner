@@ -39,6 +39,63 @@ export const useScheduleStore = create<ScheduleStore>()(
   persist(
     (set) => ({
       events: [
+        // Temporary test events to verify styles
+        {
+          id: 'test-lecture-a',
+          subject_name: 'Тест Лекция',
+          subject_type: 'lecture',
+          room: 'T101',
+          day: 'monday',
+          start_time: '09:30',
+          end_time: '11:15',
+          control_form: 'none',
+          project_type: 'none',
+          subgroup: 'none',
+          week_cycle: 'every',
+          event_type: 'regular'
+        },
+        {
+          id: 'test-lab-b',
+          subject_name: 'Тест Лаб',
+          subject_type: 'lab',
+          room: 'L202',
+          day: 'tuesday',
+          start_time: '11:30',
+          end_time: '13:15',
+          control_form: 'none',
+          project_type: 'none',
+          subgroup: 'none',
+          week_cycle: 'every',
+          event_type: 'regular'
+        },
+        {
+          id: 'test-seminar-c',
+          subject_name: 'Тест Семинар',
+          subject_type: 'seminar',
+          room: 'S303',
+          day: 'wednesday',
+          start_time: '13:45',
+          end_time: '15:30',
+          control_form: 'none',
+          project_type: 'none',
+          subgroup: 'none',
+          week_cycle: 'every',
+          event_type: 'regular'
+        },
+        {
+          id: 'test-makeup-d',
+          subject_name: 'Тест Отработване',
+          subject_type: 'lecture',
+          room: 'M404',
+          day: 'thursday',
+          start_time: '07:30',
+          end_time: '09:15',
+          control_form: 'none',
+          project_type: 'none',
+          subgroup: 'none',
+          week_cycle: 'every',
+          event_type: 'makeup'
+        },
         // MONDAY
         {
           id: 'm1',

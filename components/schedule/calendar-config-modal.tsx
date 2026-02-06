@@ -106,7 +106,7 @@ export function CalendarConfigModal({ isOpen, onClose }: CalendarConfigModalProp
             </div>
 
             <div className="pt-2 border-t border-blue-200">
-              <h4 className="font-semibold text-blue-700 text-sm flex items-center gap-2 mb-3">
+              <h4 className="font-semibold text-sm flex items-center gap-2 mb-3" style={{ color: '#ffb300' }}>
                 <BookOpen className="w-4 h-4" />
                 Редовна сесия
               </h4>
@@ -189,7 +189,7 @@ export function CalendarConfigModal({ isOpen, onClose }: CalendarConfigModalProp
             </div>
 
             <div className="pt-2 border-t border-amber-200">
-              <h4 className="font-semibold text-amber-700 text-sm flex items-center gap-2 mb-3">
+              <h4 className="font-semibold text-sm flex items-center gap-2 mb-3" style={{ color: '#ffb300' }}>
                 <BookOpen className="w-4 h-4" />
                 Редовна сесия
               </h4>

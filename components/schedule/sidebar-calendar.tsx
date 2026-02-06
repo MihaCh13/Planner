@@ -100,11 +100,14 @@ function CompactMonthGrid({
       // Check if date is within semester range for coloring
       const isWithinSemester = isDateInRange(date, semesterStart, semesterEnd);
       
+      // Only assign week parity if within semester AND not during a session
+      const isOdd = (isWithinSemester && !sessionType) ? isOddWeek(date, semesterStart) : null;
+      
       days.push({
         date,
         isCurrentMonth: date.getMonth() === month,
         isWithinSemester,
-        isOdd: isWithinSemester ? isOddWeek(date, semesterStart) : null,
+        isOdd,
         marking,
         sessionType
       });
@@ -138,15 +141,22 @@ function CompactMonthGrid({
         {calendarDays.slice(0, daysToShow).map((dayInfo, idx) => {
           const isWeekend = dayInfo.date.getDay() === 0 || dayInfo.date.getDay() === 6;
           
+          const sessionStyle = dayInfo.sessionType === 'regular' && dayInfo.isCurrentMonth
+            ? { borderBottomColor: '#ffb300' as const }
+            : undefined;
+
           return (
             <button
               type="button"
               key={idx}
               onClick={() => dayInfo.isCurrentMonth && onDateClick(dayInfo.date)}
+              style={sessionStyle}
               className={cn(
-                "aspect-square flex items-center justify-center rounded-sm text-[8px] font-medium cursor-pointer transition-all relative",
+                "aspect-square flex items-center justify-center rounded-sm text-[8px] font-medium cursor-pointer transition-all relative box-border",
                 dayInfo.isCurrentMonth 
-                  ? dayInfo.isOdd === true 
+                  ? dayInfo.sessionType
+                    ? "bg-background text-foreground hover:bg-muted"
+                    : dayInfo.isOdd === true 
                     ? "bg-blue-100 text-blue-900 hover:bg-blue-200" 
                     : dayInfo.isOdd === false
                     ? "bg-purple-100 text-purple-900 hover:bg-purple-200"
@@ -155,9 +165,9 @@ function CompactMonthGrid({
                 isWeekend && dayInfo.isCurrentMonth && dayInfo.isOdd !== null && "opacity-70",
                 dayInfo.marking === 'holiday' && dayInfo.isCurrentMonth && "ring-1 ring-red-500 ring-inset",
                 dayInfo.marking === 'vacation' && dayInfo.isCurrentMonth && "ring-1 ring-emerald-500 ring-inset bg-emerald-100 text-emerald-900",
-                dayInfo.sessionType === 'regular' && dayInfo.isCurrentMonth && "border-b border-orange-500",
-                dayInfo.sessionType === 'retake' && dayInfo.isCurrentMonth && "border-b border-purple-500",
-                dayInfo.sessionType === 'liquidation' && dayInfo.isCurrentMonth && "border-b border-pink-500"
+                dayInfo.sessionType === 'regular' && dayInfo.isCurrentMonth && "border-b-2",
+                dayInfo.sessionType === 'retake' && dayInfo.isCurrentMonth && "border-b-2 border-purple-500",
+                dayInfo.sessionType === 'liquidation' && dayInfo.isCurrentMonth && "border-b-2 border-pink-500"
               )}
             >
               {dayInfo.date.getDate()}
@@ -310,7 +320,7 @@ export function SidebarCalendar() {
       if (summerStart && summerEnd) {
         // Add Feb-June
         const current = new Date(summerStart.getFullYear(), summerStart.getMonth(), 1);
-        while (current <= summerEnd && current.getMonth() <= 5) { // Up to June (month 5)
+        while (current.getMonth() <= 5) { // Up to June (month 5)
           monthsList.push({ year: current.getFullYear(), month: current.getMonth() });
           current.setMonth(current.getMonth() + 1);
         }
@@ -320,7 +330,7 @@ export function SidebarCalendar() {
         const liquidation = calendarConfig.liquidationSession || { start: '', end: '' };
         
         if ((annualRetake?.start && annualRetake?.end) || (liquidation?.start && liquidation?.end)) {
-          // Determine the year for September (could be same year or next)
+          // Determine the year for September (same year as summer start)
           const septemberYear = summerStart.getFullYear();
           monthsList.push({ year: septemberYear, month: 8 }); // September is month 8
         }
@@ -557,79 +567,79 @@ export function SidebarCalendar() {
       {/* Responsive Legend - scales with sidebar width */}
       <div 
         className="flex flex-col gap-1.5 pt-2 border-t border-border transition-all"
-        style={{ fontSize: `${8 * scaleFactor}px` }}
+        style={{ fontSize: `${10 * scaleFactor}px` }}
       >
         <div 
           className="font-bold text-foreground uppercase tracking-wider flex items-center gap-1"
-          style={{ fontSize: `${8 * scaleFactor}px` }}
+          style={{ fontSize: `${10 * scaleFactor}px` }}
         >
-          <Pin style={{ width: `${10 * scaleFactor}px`, height: `${10 * scaleFactor}px` }} />
+          <Pin style={{ width: `${12 * scaleFactor}px`, height: `${12 * scaleFactor}px` }} />
           Обозначения
         </div>
         
-        <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
-          <div className="flex items-center gap-1.5 text-muted-foreground font-medium">
+        <div className="grid grid-cols-2 gap-x-2 gap-y-2">
+          <div className="flex items-center gap-1.5 text-muted-foreground font-semibold">
             <div 
               className="rounded-sm" 
               style={{ 
-                width: `${10 * scaleFactor}px`, 
-                height: `${10 * scaleFactor}px`,
+                width: `${12 * scaleFactor}px`, 
+                height: `${12 * scaleFactor}px`,
                 backgroundColor: '#85daff'
               }} 
             />
-            <span>Нечетна</span>
+            <span>Нечетна седмица</span>
           </div>
           
-          <div className="flex items-center gap-1.5 text-muted-foreground font-medium">
+          <div className="flex items-center gap-1.5 text-muted-foreground font-semibold">
             <div 
               className="rounded-sm" 
               style={{ 
-                width: `${10 * scaleFactor}px`, 
-                height: `${10 * scaleFactor}px`,
+                width: `${12 * scaleFactor}px`, 
+                height: `${12 * scaleFactor}px`,
                 backgroundColor: '#ff9ec6'
               }} 
             />
-            <span>Четна</span>
+            <span>Четна седмица</span>
           </div>
           
-          <div className="flex items-center gap-1.5 text-muted-foreground font-medium">
+          <div className="flex items-center gap-1.5 text-muted-foreground font-semibold">
             <div 
               className="rounded-sm ring-1 ring-red-500 ring-inset" 
-              style={{ width: `${10 * scaleFactor}px`, height: `${10 * scaleFactor}px` }} 
+              style={{ width: `${12 * scaleFactor}px`, height: `${12 * scaleFactor}px` }} 
             />
-            <span>Почивен</span>
+            <span>Почивен ден</span>
           </div>
           
-          <div className="flex items-center gap-1.5 text-muted-foreground font-medium">
+          <div className="flex items-center gap-1.5 text-muted-foreground font-semibold">
             <div 
               className="rounded-sm bg-emerald-100 ring-1 ring-emerald-500 ring-inset" 
-              style={{ width: `${10 * scaleFactor}px`, height: `${10 * scaleFactor}px` }} 
+              style={{ width: `${12 * scaleFactor}px`, height: `${12 * scaleFactor}px` }} 
             />
             <span>Ваканция</span>
           </div>
           
-          <div className="flex items-center gap-1.5 text-muted-foreground font-medium">
+          <div className="flex items-center gap-1.5 text-muted-foreground font-semibold">
             <div 
-              className="bg-orange-500 rounded-sm" 
-              style={{ width: `${16 * scaleFactor}px`, height: `${2 * scaleFactor}px` }} 
+              className="rounded-sm" 
+              style={{ width: `${19.2 * scaleFactor}px`, height: `${3 * scaleFactor}px`, backgroundColor: '#ffb300', border: '1px solid rgba(0,0,0,0.08)' }} 
             />
-            <span>Редовна</span>
+            <span>Редовна сесия</span>
           </div>
           
-          <div className="flex items-center gap-1.5 text-muted-foreground font-medium">
+          <div className="flex items-center gap-1.5 text-muted-foreground font-semibold">
             <div 
               className="bg-purple-500 rounded-sm" 
-              style={{ width: `${16 * scaleFactor}px`, height: `${2 * scaleFactor}px` }} 
+              style={{ width: `${19.2 * scaleFactor}px`, height: `${3 * scaleFactor}px`, border: '1px solid rgba(0,0,0,0.06)' }} 
             />
-            <span>Поправка</span>
+            <span>Поправителна сесия</span>
           </div>
           
-          <div className="flex items-center gap-1.5 text-muted-foreground font-medium col-span-2">
+          <div className="flex items-center gap-1.5 text-muted-foreground font-semibold col-span-2">
             <div 
               className="bg-pink-500 rounded-sm" 
-              style={{ width: `${16 * scaleFactor}px`, height: `${2 * scaleFactor}px` }} 
+              style={{ width: `${19.2 * scaleFactor}px`, height: `${3 * scaleFactor}px`, border: '1px solid rgba(0,0,0,0.06)' }} 
             />
-            <span>Ликвидация</span>
+            <span>Ликвидационна сесия</span>
           </div>
         </div>
       </div>

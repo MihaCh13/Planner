@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { cn } from "@/lib/utils"
 
 import { useMemo } from 'react';
 import { TIME_SLOTS, DAYS, DAY_NAMES, getSlotIndex, getSlotCountBetween } from '@/lib/schedule-types';
@@ -93,56 +92,31 @@ export function ScheduleTable({ onCellClick, onEventClick, onAddEvent }: Schedul
     return Math.max(1, rowSpan);
   };
 
-  // Odd/Even Week Coloring Logic
-  const getWeekType = (date: Date): 'odd' | 'even' | null => {
-    const calendarConfig = useScheduleStore.getState().calendarConfig;
-    if (!calendarConfig) return null;
-
-    const winterStart = new Date(calendarConfig.winterSemester.start);
-    const summerStart = new Date(calendarConfig.summerSemester.start);
-    
-    let referenceDate: Date | null = null;
-    
-    if (date >= winterStart && date <= new Date(calendarConfig.winterSemester.end)) {
-      referenceDate = winterStart;
-    } else if (date >= summerStart && date <= new Date(calendarConfig.summerSemester.end)) {
-      referenceDate = summerStart;
-    }
-
-    if (!referenceDate) return null;
-
-    const diffInDays = Math.floor((date.getTime() - referenceDate.getTime()) / (1000 * 60 * 60 * 24));
-    const weekNumber = Math.floor(diffInDays / 7) + 1;
-    return weekNumber % 2 === 1 ? 'odd' : 'even';
-  };
-
-  const isVacation = (date: Date): boolean => {
-    const vacations = useScheduleStore.getState().vacations;
-    const dateStr = date.toISOString().split('T')[0];
-    return vacations.includes(dateStr);
-  };
-
-  const isSession = (date: Date): string | null => {
-    const config = useScheduleStore.getState().calendarConfig;
-    if (!config) return null;
-    
-    const d = date.toISOString().split('T')[0];
-    if (d >= config.winterRegularSession.start && d <= config.winterRegularSession.end) return 'winter-regular';
-    if (d >= config.winterRetakeSession.start && d <= config.winterRetakeSession.end) return 'winter-retake';
-    if (d >= config.summerRegularSession.start && d <= config.summerRegularSession.end) return 'summer-regular';
-    if (d >= config.annualRetakeSession.start && d <= config.annualRetakeSession.end) return 'annual-retake';
-    if (d >= config.liquidationSession.start && d <= config.liquidationSession.end) return 'liquidation';
-    return null;
-  };
+  
 
   return (
-    <div className="schedule-table-wrapper flex flex-col">
+    <div className="schedule-table-wrapper flex flex-col h-full overflow-hidden">
       <ScheduleToolbar onAddEvent={onAddEvent} />
       <div className="schedule-table-grid">
         {/* HEADER ROW */}
-        <div className="schedule-header-time">Час</div>
+        <div
+          className="schedule-header-time"
+          style={{
+            background: 'linear-gradient(135deg, rgba(255, 248, 169, 0.9) 0%, rgba(255, 228, 189, 0.9) 100%)',
+            color: '#444',
+            borderBottom: '3px solid rgba(0,0,0,0.1)'
+          }}
+        >Час</div>
         {DAYS.map((day) => (
-          <div key={`header-${day}`} className="schedule-header-day">
+          <div
+            key={`header-${day}`}
+            className="schedule-header-day"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255, 248, 169, 0.9) 0%, rgba(255, 228, 189, 0.9) 100%)',
+              color: '#444',
+              borderBottom: '2px solid rgba(0,0,0,0.05)'
+            }}
+          >
             {DAY_NAMES[day]}
           </div>
         ))}
@@ -153,13 +127,13 @@ export function ScheduleTable({ onCellClick, onEventClick, onAddEvent }: Schedul
             // LUNCH BREAK ROW - Merged cell spanning all day columns
             return (
               <React.Fragment key={`lunch-${slotIdx}`}>
-                <div className="schedule-lunch-label">
+                <div className="schedule-lunch-label" style={{ borderBottom: '3px solid rgba(0,0,0,0.1)' }}>
                   {slot.start}–{slot.end}
                 </div>
                 <div
-                  className={"col-span-5 flex flex-row items-center justify-center gap-3 text-stone-900 bg-gradient-to-r from-[#ffbeb8]/40 to-[#ffd294]/40 backdrop-blur-md shadow-sm p-2 font-bold"}
+                  className="col-span-5 flex flex-row items-center justify-center gap-3 p-2 font-bold text-stone-900/90 bg-gradient-to-r from-[#FFC2A9]/80 to-[#FEEBAE]/80 backdrop-blur-md border border-white/30 border-t-2 border-white/70 border-b-[3px] border-stone-900/10 ring-1 ring-white/10 shadow-lg"
                 >
-                  <UtensilsCrossed className="w-4 h-4" />
+                  <UtensilsCrossed className="w-6 h-6" />
                   <span>Обедна почивка</span>
                 </div>
               </React.Fragment>
@@ -169,7 +143,7 @@ export function ScheduleTable({ onCellClick, onEventClick, onAddEvent }: Schedul
           // CONTENT ROW - Time slot with events
           return (
             <React.Fragment key={`slot-${slotIdx}`}>
-              <div className="schedule-time-label">
+              <div className="schedule-time-label" style={{ borderBottom: '3px solid rgba(0,0,0,0.1)' }}>
                 {slot.start}–{slot.end}
               </div>
               {DAYS.map((day) => {

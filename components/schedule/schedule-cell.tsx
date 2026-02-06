@@ -10,16 +10,16 @@ const getBorderColorForEvent = (event: ScheduleEvent): string => {
   const isMakeup = event.event_type === 'makeup';
   
   if (isMakeup) {
-    return '#5fcfb8'; // makeup-bg border
+    return '#E5A5D5'; // makeup diagonal for makeup-bg (darker pink)
   }
   
   switch (event.subject_type) {
     case 'lecture':
-      return 'oklch(0.65 0.12 145)'; // lecture-bg border
+      return '#86EFAC'; // lecture diagonal/border for mint lecture style
     case 'seminar':
-      return 'oklch(0.7 0.14 45)'; // seminar-bg border
+      return '#2DD4BF'; // seminar diagonal/border for new seminar style
     case 'lab':
-      return 'oklch(0.65 0.12 280)'; // lab-bg border
+      return '#CEBDE6'; // lab diagonal/border updated to soft lavender-grey
     default:
       return 'rgba(100,100,100,0.4)'; // fallback
   }
@@ -55,10 +55,10 @@ export function ScheduleCell({
   const totalEventCount = events.length;
 
   // Render empty cell
-  if (isEmpty) {
+    if (isEmpty) {
     return (
       <div 
-        className={cn("schedule-content-cell schedule-cell empty-cell border border-border")}
+        className={cn("schedule-content-cell schedule-cell container-query empty-cell border border-border max-w-full")}
         style={{ gridRow: `span ${gridRow}` }}
         onClick={onCellClick}
       >
@@ -73,10 +73,10 @@ export function ScheduleCell({
   if (everyWeekEvents.length === 1 && oddWeekEvents.length === 0 && evenWeekEvents.length === 0) {
     return (
       <div 
-        className="schedule-content-cell schedule-cell border border-border p-0"
+        className="schedule-content-cell schedule-cell container-query border border-border p-0 max-w-full"
         style={{ gridRow: `span ${gridRow}` }}
       >
-        <div className="h-full w-full">
+        <div className="h-full w-full max-w-full overflow-hidden">
           <EventBlock 
             event={everyWeekEvents[0]} 
             onClick={() => onEventClick(everyWeekEvents[0])} 
@@ -90,7 +90,7 @@ export function ScheduleCell({
   if (everyWeekEvents.length > 1 && oddWeekEvents.length === 0 && evenWeekEvents.length === 0) {
     return (
       <div 
-        className="schedule-content-cell schedule-cell border border-border p-0"
+        className="schedule-content-cell schedule-cell container-query border border-border p-0"
         style={{ gridRow: `span ${gridRow}` }}
       >
         <div className="grid-2x2">
@@ -115,7 +115,7 @@ export function ScheduleCell({
     
     return (
       <div 
-        className="schedule-content-cell schedule-cell border border-border p-0"
+        className="schedule-content-cell schedule-cell container-query border border-border p-0"
         style={{ gridRow: `span ${gridRow}` }}
       >
         <div className="grid-2x2">
@@ -148,7 +148,7 @@ export function ScheduleCell({
   if ((hasOdd || hasEven) && totalEventCount <= 2) {
     return (
       <div 
-        className="schedule-content-cell schedule-cell border border-border p-0"
+        className="schedule-content-cell schedule-cell border border-border p-0 max-w-full"
         style={{ gridRow: `span ${gridRow}` }}
       >
         <div className="diagonal-container">
@@ -166,8 +166,10 @@ export function ScheduleCell({
             ) : (
               <div className="diagonal-empty" />
             )}
-            {/* ODD Week Badge - Top-Left */}
-            <div className="week-badge odd-badge">Нечетна</div>
+            {/* ODD Week Badge - Top-Left (safely inset) */}
+            <div className="absolute top-1 left-1 z-50 pointer-events-none">
+              <div className="week-badge odd-badge relative z-30">Нечетна</div>
+            </div>
           </div>
           
           {/* EVEN Week Triangle - Bottom-Right */}
@@ -184,8 +186,10 @@ export function ScheduleCell({
             ) : (
               <div className="diagonal-empty" />
             )}
-            {/* EVEN Week Badge - Bottom-Right */}
-            <div className="week-badge even-badge">Четна</div>
+            {/* EVEN Week Badge - Bottom-Right (safely inset) */}
+            <div className="absolute bottom-1 right-1 z-50 pointer-events-none">
+              <div className="week-badge even-badge relative z-30">Четна</div>
+            </div>
           </div>
           {/* Always-visible diagonal dividing line with dynamic color matching the event */}
           <div 
@@ -207,7 +211,7 @@ export function ScheduleCell({
   // Fallback: render all events in a flex column
   return (
     <div 
-      className="schedule-content-cell schedule-cell border border-border p-1"
+      className="schedule-content-cell schedule-cell container-query border border-border p-1 max-w-full"
       style={{ gridRow: `span ${gridRow}` }}
     >
       <div className="h-full flex flex-col gap-1 overflow-hidden">
